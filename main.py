@@ -1,5 +1,6 @@
 import httpx
 from fastapi import FastAPI
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ def fetch_quakes():
             "depth": depth,
             "lat": lat,
             "lon": lon,
-            "time": props["time"],
+            "time": datetime.fromtimestamp(props["time"] / 1000, tz=timezone.utc).isoformat(),
         })
     return quakes
 
@@ -32,6 +33,7 @@ def home():
 def get_quakes(min_mag: float = 0):
     results = []
     for quake in fetch_quakes():
-        if quake["mag"] is not None and quake["mag"] >= min_mag:
-            results.append(quake)
+        if 20 <= quake["lat"] <= 46 and 122 <= quake["lon"] <= 153 :    # japan only
+            if quake["mag"] is not None and quake["mag"] >= min_mag:
+                results.append(quake)
     return results
