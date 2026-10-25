@@ -4,10 +4,11 @@ from datetime import datetime, timezone
 
 app = FastAPI()
 
-USGS_URL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson"
 
-def fetch_quakes():
+
+def fetch_quakes(period):
     """Download earthquakes from USGS and simplify them."""
+    USGS_URL = f"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_{period}.geojson"
     response = httpx.get(USGS_URL)
     data = response.json()
 
@@ -30,9 +31,11 @@ def home():
     return {"message": "Hello from my earthquake API!"}
 
 @app.get("/quakes")
-def get_quakes(min_mag: float = 0):
+def get_quakes(min_mag: float = 0, period: str = "week"):
+    if period not in ["day", "week", "month"]:
+        return {"error": "period must be day, week or month"}
     results = []
-    for quake in fetch_quakes():
+    for quake in fetch_quakes(period):
         if 20 <= quake["lat"] <= 46 and 122 <= quake["lon"] <= 153 :    # japan only
             if quake["mag"] is not None and quake["mag"] >= min_mag:
                 results.append(quake)
