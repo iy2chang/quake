@@ -37,3 +37,7 @@ def get_quakes(min_mag: float = 0):
             if quake["mag"] is not None and quake["mag"] >= min_mag:
                 results.append(quake)
     return results
+
+@app.get("/count")
+def get_count():
+    return {"count": len(fetch_quakes())}
