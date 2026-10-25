@@ -16,9 +16,22 @@ def home():
     return {"message": "Hello from my earthquake API"}
 
 @app.get("/quakes")
-def get_quakes():
-    return QUAKES
+def get_quakes(min_mag: float = 0, max_depth: float = 1000):
+    results = []
+    for quake in QUAKES:
+        if quake["mag"] >= min_mag and quake["depth"] <= max_depth:
+            results.append(quake)
+
+    return results
 
 @app.get("/count")
 def get_count():
     return {"count": len(QUAKES)}
+
+@app.get("/strongest")
+def get_strongest():
+    strongest = QUAKES[0]
+    for quake in QUAKES:
+        if quake["mag"] > strongest["mag"]:
+            strongest = quake
+    return strongest
